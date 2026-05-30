@@ -141,9 +141,9 @@ h1,h2,h3,h4{font-family:var(--fh)}
 .day-pill{background:var(--bg3);border-radius:20px;padding:3px 10px;font-size:11px;font-family:var(--fh);color:var(--muted)}
 .active-r .day-pill{background:rgba(200,241,53,.15);color:var(--accent)}
 /* DAY TABS */
-.day-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.day-tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin-bottom:10px;scrollbar-width:none}
 .day-tabs::-webkit-scrollbar{display:none}
-.day-tab{flex-shrink:0;padding:7px 14px;border-radius:20px;font-family:var(--fh);font-size:12px;font-weight:600;border:1px solid var(--border2);background:var(--bg3);color:var(--muted);cursor:pointer;transition:all .15s}
+.day-tab{flex:1;min-width:fit-content;flex-shrink:0;padding:10px 16px;border-radius:12px;font-family:var(--fh);font-size:13px;font-weight:700;border:1.5px solid var(--border2);background:var(--bg3);color:var(--muted);cursor:pointer;transition:all .15s;text-align:center}
 .day-tab.active{background:var(--accent);color:#0d0d0f;border-color:var(--accent)}
 /* SUGGEST BANNER */
 .suggest-banner{background:var(--blue-dim);border:1px solid var(--blue);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px}
@@ -271,6 +271,8 @@ h1,h2,h3,h4{font-family:var(--fh)}
     <button style="font-size:11px;color:var(--muted);padding:2px 8px;background:var(--bg);border-radius:6px;border:1px solid var(--border2)" onclick="skipRest()">Skip</button>
   </div>
 
+  <div id="day-tabs" class="day-tabs" style="display:none"></div>
+
   <div id="suggest-banner" class="suggest-banner" style="display:none">
     <svg width="16" height="16" viewBox="0 0 24 24" style="stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     <p id="suggest-text"></p>
@@ -280,8 +282,6 @@ h1,h2,h3,h4{font-family:var(--fh)}
     <h3>Deload Recommended</h3>
     <p id="deload-msg"></p>
   </div>
-
-  <div id="day-tabs" class="day-tabs" style="display:none"></div>
   <div id="today-loading"><div class="spinner"></div></div>
   <div id="today-exercises"></div>
 
@@ -340,10 +340,13 @@ h1,h2,h3,h4{font-family:var(--fh)}
 <div class="screen" id="screen-library">
   <div class="flex items-center justify-between mb-8">
     <h2 style="font-family:var(--fh);font-size:22px;font-weight:800">Exercise Library</h2>
-    <button class="btn-sec" onclick="openExerciseEditor(null)">+ Add</button>
+    <div style="display:flex;gap:6px">
+      <button class="btn-sec" style="padding:8px 12px;font-size:12px" onclick="openBulkUpload()">Import CSV</button>
+      <button class="btn-sec" style="padding:8px 12px;font-size:12px" onclick="openExerciseEditor(null)">+ Add</button>
+    </div>
   </div>
   <!-- Filter bar -->
-  <div style="display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none">
+  <div class="day-tabs" style="margin-bottom:12px">
     <button class="day-tab active" id="lib-filter-all" onclick="setLibFilter('all',this)">All</button>
     <button class="day-tab" id="lib-filter-Push" onclick="setLibFilter('Push',this)">Push</button>
     <button class="day-tab" id="lib-filter-Pull" onclick="setLibFilter('Pull',this)">Pull</button>
@@ -574,6 +577,50 @@ h1,h2,h3,h4{font-family:var(--fh)}
   </div>
 </div>
 
+
+<!-- ===== BULK UPLOAD MODAL ===== -->
+<div class="modal-bg" id="bulk-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-12">
+      <div class="modal-title" style="margin:0">Import Exercises</div>
+      <button class="btn-ghost" onclick="closeModal('bulk-modal')">X</button>
+    </div>
+
+    <!-- Step 1: Download template -->
+    <div style="background:var(--bg3);border-radius:var(--r);padding:14px;margin-bottom:14px">
+      <div style="font-family:var(--fh);font-weight:700;font-size:13px;margin-bottom:6px">Step 1 — Download the template</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">Fill in the CSV template with your exercises. Each row is one exercise. Required columns: name, category, primary_muscles.</p>
+      <button class="btn-sec w-full" onclick="downloadTemplate()">
+        <svg width="14" height="14" viewBox="0 0 24 24" style="stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;vertical-align:middle;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download CSV Template
+      </button>
+    </div>
+
+    <!-- Step 2: Upload filled file -->
+    <div style="background:var(--bg3);border-radius:var(--r);padding:14px;margin-bottom:14px">
+      <div style="font-family:var(--fh);font-weight:700;font-size:13px;margin-bottom:6px">Step 2 — Upload your filled file</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">Accepts .csv or .txt files. Max 500 exercises per upload.</p>
+      <label style="display:block;background:var(--bg);border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:border .15s" id="drop-zone">
+        <svg width="28" height="28" viewBox="0 0 24 24" style="stroke:var(--muted);fill:none;stroke-width:1.5;stroke-linecap:round;display:block;margin:0 auto 8px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div style="font-family:var(--fh);font-weight:600;font-size:13px;color:var(--text);margin-bottom:4px">Tap to choose file</div>
+        <div style="font-size:11px;color:var(--muted)" id="drop-zone-label">CSV or TXT file</div>
+        <input type="file" id="bulk-file-input" accept=".csv,.txt" style="display:none" onchange="handleBulkFile(this)"/>
+      </label>
+    </div>
+
+    <!-- Preview -->
+    <div id="bulk-preview" style="display:none;margin-bottom:14px">
+      <div style="font-family:var(--fh);font-weight:700;font-size:13px;margin-bottom:8px">Preview <span id="bulk-count" style="color:var(--accent)"></span></div>
+      <div id="bulk-preview-list" style="max-height:200px;overflow-y:auto;background:var(--bg3);border-radius:var(--rsm);padding:8px"></div>
+      <div id="bulk-errors" style="margin-top:8px;font-size:11px;color:var(--red)"></div>
+    </div>
+
+    <button class="btn-primary" id="bulk-import-btn" onclick="doBulkImport()" style="display:none">Import All Exercises</button>
+    <div id="bulk-status" class="text-xs mt-8" style="text-align:center"></div>
+  </div>
+</div>
+
 </div><!-- /app -->
 <script>
 // ===== STATE =====
@@ -774,34 +821,68 @@ function loadTodayWorkout(){
 }
 
 // ===== MUSCLE SVG =====
+// Muscle coords for 100x220 viewBox body diagram
+// Each entry: cx, cy, rx (width), ry (height) as ellipses
 var MC={
-  'chest':[{x:68,y:52,r:14},{x:92,y:52,r:14}],'upper-chest':[{x:68,y:44,r:10},{x:92,y:44,r:10}],
-  'lower-chest':[{x:68,y:60,r:10},{x:92,y:60,r:10}],'front-delt':[{x:52,y:48,r:8},{x:108,y:48,r:8}],
-  'mid-delt':[{x:46,y:56,r:7},{x:114,y:56,r:7}],'rear-delt':[{x:46,y:60,r:6},{x:114,y:60,r:6}],
-  'all-delt':[{x:48,y:52,r:9},{x:112,y:52,r:9}],'triceps':[{x:44,y:72,r:8},{x:116,y:72,r:8}],
-  'biceps':[{x:46,y:68,r:7},{x:114,y:68,r:7}],'brachialis':[{x:44,y:74,r:6},{x:116,y:74,r:6}],
-  'lats':[{x:60,y:72,r:12},{x:100,y:72,r:12}],'traps':[{x:68,y:38,r:8},{x:92,y:38,r:8}],
-  'upper-traps':[{x:72,y:34,r:6},{x:88,y:34,r:6}],'mid-traps':[{x:68,y:62,r:8},{x:92,y:62,r:8}],
-  'erectors':[{x:72,y:84,r:7},{x:88,y:84,r:7}],'quads':[{x:64,y:108,r:12},{x:96,y:108,r:12}],
-  'hamstrings':[{x:64,y:118,r:10},{x:96,y:118,r:10}],'glutes':[{x:66,y:96,r:12},{x:94,y:96,r:12}],
-  'adductors':[{x:72,y:112,r:7},{x:88,y:112,r:7}],'calves':[{x:66,y:134,r:8},{x:94,y:134,r:8}],
-  'gastrocnemius':[{x:66,y:134,r:8},{x:94,y:134,r:8}],'soleus':[{x:67,y:140,r:6},{x:93,y:140,r:6}],
-  'abs':[{x:80,y:76,r:10}],'obliques':[{x:66,y:78,r:7},{x:94,y:78,r:7}],
-  'hip-flexors':[{x:70,y:95,r:7},{x:90,y:95,r:7}],'back':[{x:68,y:72,r:14},{x:92,y:72,r:14}]
+  'chest':         [{x:38,y:52,rx:10,ry:8},{x:62,y:52,rx:10,ry:8}],
+  'upper-chest':   [{x:38,y:44,rx:8,ry:6},{x:62,y:44,rx:8,ry:6}],
+  'lower-chest':   [{x:38,y:58,rx:8,ry:6},{x:62,y:58,rx:8,ry:6}],
+  'front-delt':    [{x:26,y:40,rx:7,ry:6},{x:74,y:40,rx:7,ry:6}],
+  'mid-delt':      [{x:21,y:50,rx:6,ry:8},{x:79,y:50,rx:6,ry:8}],
+  'rear-delt':     [{x:22,y:46,rx:6,ry:6},{x:78,y:46,rx:6,ry:6}],
+  'all-delt':      [{x:23,y:44,rx:7,ry:8},{x:77,y:44,rx:7,ry:8}],
+  'triceps':       [{x:20,y:60,rx:5,ry:8},{x:80,y:60,rx:5,ry:8}],
+  'biceps':        [{x:22,y:56,rx:5,ry:7},{x:78,y:56,rx:5,ry:7}],
+  'brachialis':    [{x:22,y:64,rx:4,ry:5},{x:78,y:64,rx:4,ry:5}],
+  'lats':          [{x:34,y:64,rx:8,ry:14},{x:66,y:64,rx:8,ry:14}],
+  'traps':         [{x:38,y:36,rx:8,ry:6},{x:62,y:36,rx:8,ry:6}],
+  'upper-traps':   [{x:42,y:30,rx:6,ry:5},{x:58,y:30,rx:6,ry:5}],
+  'mid-traps':     [{x:38,y:58,rx:7,ry:6},{x:62,y:58,rx:7,ry:6}],
+  'erectors':      [{x:44,y:74,rx:5,ry:10},{x:56,y:74,rx:5,ry:10}],
+  'abs':           [{x:50,y:66,rx:9,ry:14}],
+  'obliques':      [{x:36,y:68,rx:5,ry:10},{x:64,y:68,rx:5,ry:10}],
+  'hip-flexors':   [{x:40,y:94,rx:7,ry:6},{x:60,y:94,rx:7,ry:6}],
+  'glutes':        [{x:38,y:104,rx:10,ry:10},{x:62,y:104,rx:10,ry:10}],
+  'quads':         [{x:37,y:128,rx:9,ry:18},{x:63,y:128,rx:9,ry:18}],
+  'hamstrings':    [{x:37,y:130,rx:8,ry:16},{x:63,y:130,rx:8,ry:16}],
+  'adductors':     [{x:42,y:120,rx:6,ry:12},{x:58,y:120,rx:6,ry:12}],
+  'calves':        [{x:36,y:170,rx:7,ry:14},{x:64,y:170,rx:7,ry:14}],
+  'gastrocnemius': [{x:36,y:168,rx:7,ry:14},{x:64,y:168,rx:7,ry:14}],
+  'soleus':        [{x:36,y:178,rx:6,ry:10},{x:64,y:178,rx:6,ry:10}],
+  'back':          [{x:38,y:64,rx:12,ry:16},{x:62,y:64,rx:12,ry:16}],
+  'cardiovascular':[]
 };
 function buildMuscleSVG(pri,sec){
   var p=(pri||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
   var s=(sec||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
-  var sil='<ellipse cx="80" cy="28" rx="14" ry="16" fill="#2a2a35"/>'+
-    '<rect x="58" y="42" width="44" height="52" rx="6" fill="#2a2a35"/>'+
-    '<rect x="42" y="44" width="18" height="44" rx="6" fill="#2a2a35"/>'+
-    '<rect x="100" y="44" width="18" height="44" rx="6" fill="#2a2a35"/>'+
-    '<rect x="62" y="92" width="18" height="58" rx="6" fill="#2a2a35"/>'+
-    '<rect x="80" y="92" width="18" height="58" rx="6" fill="#2a2a35"/>';
-  var c='';
-  s.forEach(function(m){(MC[m]||[]).forEach(function(o){c+='<circle cx="'+o.x+'" cy="'+o.y+'" r="'+o.r+'" fill="rgba(255,179,71,0.55)"/>';});});
-  p.forEach(function(m){(MC[m]||[]).forEach(function(o){c+='<circle cx="'+o.x+'" cy="'+o.y+'" r="'+o.r+'" fill="rgba(200,241,53,0.75)"/>';});});
-  return '<svg class="muscle-svg" viewBox="0 0 160 160">'+sil+c+'</svg>';
+  // Proper body silhouette - viewBox 0 0 100 220 for full body
+  var sil=
+    // Head
+    '<ellipse cx="50" cy="14" rx="10" ry="12" fill="#2a2a35"/>'+
+    // Neck
+    '<rect x="46" y="24" width="8" height="8" rx="2" fill="#2a2a35"/>'+
+    // Torso
+    '<path d="M32 32 Q26 36 26 48 L28 88 Q28 92 32 92 L68 92 Q72 92 72 88 L74 48 Q74 36 68 32 Z" fill="#2a2a35"/>'+
+    // Left arm upper
+    '<path d="M32 34 Q20 36 18 52 L18 68 Q18 72 22 72 L30 72 Q34 72 34 68 L34 52 Z" fill="#2a2a35"/>'+
+    // Left forearm
+    '<path d="M20 70 L20 90 Q20 94 24 94 L28 94 Q32 94 32 90 L32 70 Z" fill="#2a2a35"/>'+
+    // Right arm upper
+    '<path d="M68 34 Q80 36 82 52 L82 68 Q82 72 78 72 L70 72 Q66 72 66 68 L66 52 Z" fill="#2a2a35"/>'+
+    // Right forearm
+    '<path d="M80 70 L80 90 Q80 94 76 94 L72 94 Q68 94 68 90 L68 70 Z" fill="#2a2a35"/>'+
+    // Left thigh
+    '<path d="M32 90 L30 92 L26 140 Q26 146 32 146 L44 146 Q48 146 48 140 L46 92 Z" fill="#2a2a35"/>'+
+    // Right thigh
+    '<path d="M54 92 L56 92 L60 92 L74 140 Q74 146 68 146 L56 146 Q52 146 52 140 L54 92 Z" fill="#2a2a35"/>'+
+    // Left shin
+    '<path d="M28 144 L26 186 Q26 192 32 192 L42 192 Q46 192 46 186 L44 144 Z" fill="#2a2a35"/>'+
+    // Right shin
+    '<path d="M56 144 L54 186 Q54 192 60 192 L70 192 Q74 192 74 186 L72 144 Z" fill="#2a2a35"/>';
+  var ci='';
+  s.forEach(function(m){(MC[m]||[]).forEach(function(o){ci+='<ellipse cx="'+o.x+'" cy="'+o.y+'" rx="'+o.rx+'" ry="'+o.ry+'" fill="rgba(255,179,71,0.6)"/>';});});
+  p.forEach(function(m){(MC[m]||[]).forEach(function(o){ci+='<ellipse cx="'+o.x+'" cy="'+o.y+'" rx="'+o.rx+'" ry="'+o.ry+'" fill="rgba(200,241,53,0.8)"/>';});});
+  return '<svg class="muscle-svg" viewBox="0 0 100 220" style="width:60px;height:130px">'+sil+ci+'</svg>';
 }
 
 // ===== BUILD EXERCISE CARD =====
@@ -1638,6 +1719,211 @@ function confirmDeleteExercise(exId){
     if(res.ok){libData=[];loadLibrary();}
     else alert('Error: '+(res.error||'Unknown'));
   }).catch(function(e){alert('Error: '+e.message);});
+}
+
+
+// ===== BULK UPLOAD =====
+var bulkParsed = [];
+
+function openBulkUpload(){
+  bulkParsed = [];
+  document.getElementById('bulk-preview').style.display='none';
+  document.getElementById('bulk-import-btn').style.display='none';
+  document.getElementById('bulk-status').textContent='';
+  document.getElementById('bulk-status').style.color='var(--muted)';
+  document.getElementById('drop-zone-label').textContent='CSV or TXT file';
+  document.getElementById('bulk-file-input').value='';
+  openModal('bulk-modal');
+}
+
+function downloadTemplate(){
+  var headers = ['name','category','primary_muscles','secondary_muscles','equipment','is_compound','default_sets_range','slot_type','youtube_url'];
+  var examples = [
+    ['Cable Chest Fly','Push','chest,lower-chest','triceps','Cable','FALSE','3','accessory','https://www.youtube.com/watch?v=example1'],
+    ['Hack Squat','Legs','quads,glutes','hamstrings','Machine','TRUE','3-4','core','https://www.youtube.com/watch?v=example2'],
+    ['EZ Bar Curl','Pull','biceps','','Barbell','FALSE','3-4','accessory',''],
+    ['Incline Dumbbell Curl','Pull','biceps','','Dumbbell','FALSE','3','accessory',''],
+    ['Dumbbell Shrug','Pull','upper-traps','','Dumbbell','FALSE','3','accessory','']
+  ];
+  var csv = headers.join(',') + '\\n';
+  examples.forEach(function(row){
+    csv += row.map(function(cell){
+      // Quote cells that contain commas
+      return cell.indexOf(',') >= 0 ? '"'+cell+'"' : cell;
+    }).join(',') + '\n';
+  });
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'ironlog_exercise_template.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function handleBulkFile(input){
+  var file = input.files[0];
+  if(!file) return;
+  document.getElementById('drop-zone-label').textContent = file.name;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    parseBulkCSV(e.target.result);
+  };
+  reader.readAsText(file);
+}
+
+function parseBulkCSV(text){
+  bulkParsed = [];
+  var errors = [];
+  var lines = text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  if(lines.length < 2){
+    document.getElementById('bulk-status').textContent = 'File appears empty or invalid.';
+    document.getElementById('bulk-status').style.color = 'var(--red)';
+    return;
+  }
+
+  // Parse header row - find column indices
+  var headers = parseCSVRow(lines[0]).map(function(h){return h.toLowerCase().trim();});
+  var COL = {
+    name:               headers.indexOf('name'),
+    category:           headers.indexOf('category'),
+    primary_muscles:    headers.indexOf('primary_muscles'),
+    secondary_muscles:  headers.indexOf('secondary_muscles'),
+    equipment:          headers.indexOf('equipment'),
+    is_compound:        headers.indexOf('is_compound'),
+    default_sets_range: headers.indexOf('default_sets_range'),
+    slot_type:          headers.indexOf('slot_type'),
+    youtube_url:        headers.indexOf('youtube_url')
+  };
+
+  if(COL.name < 0)      {errors.push('Missing required column: name'); }
+  if(COL.category < 0)  {errors.push('Missing required column: category'); }
+  if(COL.primary_muscles < 0){errors.push('Missing required column: primary_muscles'); }
+
+  if(errors.length > 0){
+    document.getElementById('bulk-errors').textContent = errors.join(' | ');
+    document.getElementById('bulk-preview').style.display = 'block';
+    return;
+  }
+
+  var VALID_CATS = ['Push','Pull','Legs','Core','Full Body','Cardio'];
+  var VALID_EQ   = ['Barbell','Dumbbell','Cable','Machine','Bodyweight','Kettlebell','Resistance Band','Other'];
+
+  for(var i=1; i<Math.min(lines.length, 501); i++){
+    var cells = parseCSVRow(lines[i]);
+    if(cells.length < 2) continue;
+
+    var name = (cells[COL.name]||'').trim();
+    if(!name) continue;
+
+    var cat = (cells[COL.category]||'Push').trim();
+    // Normalise category capitalisation
+    var catMatch = VALID_CATS.find(function(v){return v.toLowerCase()===cat.toLowerCase();});
+    cat = catMatch || 'Push';
+
+    var eq = COL.equipment>=0 ? (cells[COL.equipment]||'Barbell').trim() : 'Barbell';
+    var eqMatch = VALID_EQ.find(function(v){return v.toLowerCase()===eq.toLowerCase();});
+    eq = eqMatch || 'Other';
+
+    var isCompound = COL.is_compound>=0 ? (cells[COL.is_compound]||'').trim().toLowerCase() : 'true';
+    isCompound = (isCompound==='true'||isCompound==='yes'||isCompound==='1');
+
+    var slotType = COL.slot_type>=0 ? (cells[COL.slot_type]||'').trim().toLowerCase() : '';
+    if(slotType!=='core'&&slotType!=='accessory') slotType = isCompound ? 'core' : 'accessory';
+
+    bulkParsed.push({
+      name:               name,
+      category:           cat,
+      primary_muscles:    COL.primary_muscles>=0 ? (cells[COL.primary_muscles]||'').trim() : '',
+      secondary_muscles:  COL.secondary_muscles>=0 ? (cells[COL.secondary_muscles]||'').trim() : '',
+      equipment:          eq,
+      is_compound:        isCompound,
+      default_sets_range: COL.default_sets_range>=0 ? (cells[COL.default_sets_range]||'3-4').trim() : '3-4',
+      slot_type:          slotType,
+      youtube_url:        COL.youtube_url>=0 ? (cells[COL.youtube_url]||'').trim() : ''
+    });
+  }
+
+  // Show preview
+  document.getElementById('bulk-preview').style.display = 'block';
+  document.getElementById('bulk-count').textContent = bulkParsed.length + ' exercises found';
+  document.getElementById('bulk-errors').textContent = '';
+
+  var previewHTML = '';
+  bulkParsed.slice(0,10).forEach(function(ex){
+    previewHTML += '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">'+
+      '<span style="font-family:var(--fh);font-weight:600">'+ex.name+'</span> '+
+      '<span style="color:var(--muted)">'+ex.category+' - '+ex.primary_muscles+'</span>'+
+      (ex.youtube_url ? ' <span style="color:var(--red);font-size:10px">YT</span>' : '')+
+    '</div>';
+  });
+  if(bulkParsed.length > 10){
+    previewHTML += '<div style="padding:6px 0;font-size:11px;color:var(--muted)">... and '+(bulkParsed.length-10)+' more</div>';
+  }
+  document.getElementById('bulk-preview-list').innerHTML = previewHTML || '<p style="color:var(--muted);font-size:12px">No valid rows found. Check your file format.</p>';
+
+  if(bulkParsed.length > 0){
+    document.getElementById('bulk-import-btn').style.display = 'block';
+  }
+}
+
+// Simple CSV row parser that handles quoted fields
+function parseCSVRow(line){
+  var result = [];
+  var current = '';
+  var inQuotes = false;
+  for(var i=0; i<line.length; i++){
+    var ch = line[i];
+    if(ch==='"'){
+      inQuotes = !inQuotes;
+    } else if(ch===',' && !inQuotes){
+      result.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function doBulkImport(){
+  if(!bulkParsed.length) return;
+  var btn = document.getElementById('bulk-import-btn');
+  btn.disabled = true;
+  btn.textContent = 'Importing 0 / ' + bulkParsed.length + '...';
+  document.getElementById('bulk-status').style.color = 'var(--muted)';
+
+  var done = 0;
+  var failed = 0;
+
+  // Send in batches of 10 to avoid overwhelming the API
+  function sendBatch(startIdx){
+    var batch = bulkParsed.slice(startIdx, startIdx + 10);
+    if(batch.length === 0){
+      // All done
+      document.getElementById('bulk-status').textContent =
+        'Done! ' + done + ' imported' + (failed > 0 ? ', ' + failed + ' failed.' : '.');
+      document.getElementById('bulk-status').style.color = done > 0 ? 'var(--accent)' : 'var(--red)';
+      btn.textContent = 'Import All Exercises';
+      btn.disabled = false;
+      libData = [];
+      setTimeout(function(){closeModal('bulk-modal'); loadLibrary();}, 1200);
+      return;
+    }
+
+    var promises = batch.map(function(ex){
+      return apiPost(Object.assign({action:'save_exercise'}, ex))
+        .then(function(res){ if(res.ok) done++; else failed++; })
+        .catch(function(){ failed++; });
+    });
+
+    Promise.all(promises).then(function(){
+      btn.textContent = 'Importing ' + (startIdx + batch.length) + ' / ' + bulkParsed.length + '...';
+      sendBatch(startIdx + 10);
+    });
+  }
+
+  sendBatch(0);
 }
 
 // ===== MODALS =====
